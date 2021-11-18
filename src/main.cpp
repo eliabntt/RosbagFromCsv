@@ -6,15 +6,12 @@
 #include<std_msgs/Time.h>
 #include<std_msgs/Header.h>
 #include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 
 #include "opencv2/imgcodecs/imgcodecs.hpp"
-#include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui_c.h>
-#include <opencv2/imgproc/imgproc.hpp>
-
+#include "neural_network_detector/NeuralNetworkFeedback.h"
 
 using namespace std;
 
@@ -90,15 +87,21 @@ void read_csv(const string &filename, vector <cv::Mat> &images_c1, vector <cv::M
     }
 }
 
-string toInfoMsg(vector<int> bb, ros::Time time) {
+neural_network_detector::NeuralNetworkFeedback toInfoMsg(vector<int> bb, ros::Time time, int id = 1, int seq = 0) {
     // todo create header
+    neural_network_detector::NeuralNetworkFeedback info;
+    info.header.stamp = time;
+    info.header.frame_id = "drone_"+to_string(id);
+    info.header.seq = seq;
 
     // todo adapt to msg type
     int s;
-    for (auto i: bb) {
-        s = bb[i];
-    }
-    return to_string(s);
+    info.xcenter = bb[0];
+    info.ycenter = bb[1];
+    info.ymax = bb[2];
+    info.ymin = bb[3];
+
+    return info;
 }
 
 
@@ -146,11 +149,11 @@ int main(int argc, char **argv) {
         cvImage.encoding = sensor_msgs::image_encodings::RGB8;
         cvImage.header.stamp = t;
         bag_out_d1.write("/drone_1/camera/image_raw", ros::Time(t), cvImage.toImageMsg());
-//        bag_out_d1.write("/drone_1/info", ros::Time(t), toInfoMsg(bb_c1[i], ros::Time(t)));
+        bag_out_d1.write("/drone_1/info", ros::Time(t), toInfoMsg(bb_c1[i], ros::Time(t), 1));
 
         // write info to bag 2
         bag_out_d2.write("/drone_2/camera/image_raw", ros::Time(t), cvImage.toImageMsg());
-//        bag_out_d2.write("/drone_2/info", ros::Time(t), toInfoMsg(bb_c1[i], ros::Time(t)));
+        bag_out_d2.write("/drone_2/info", ros::Time(t), toInfoMsg(bb_c1[i], ros::Time(t), 2));
 
         t += d;
         cout << i << " th frame " << endl;

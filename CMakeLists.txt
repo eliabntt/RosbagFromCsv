@@ -8,12 +8,13 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  cv_bridge
-  rosbag
-  roscpp
-  std_msgs
-  sensor_msgs
-)
+        cv_bridge
+        rosbag
+        roscpp
+        std_msgs
+        sensor_msgs
+        neural_network_detector
+        )
 
 find_package(OpenCV)
 
@@ -27,16 +28,16 @@ find_package(OpenCV)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-  CATKIN_DEPENDS cv_bridge rosbag roscpp std_msgs  sensor_msgs
-  DEPENDS OpenCV
-#  DEPENDS system_lib
+        #  INCLUDE_DIRS include
+        CATKIN_DEPENDS cv_bridge rosbag roscpp std_msgs sensor_msgs neural_network_detector
+        DEPENDS OpenCV
+        #  DEPENDS system_lib
 )
 
 SET(Libraries
         ${OpenCV_LIBRARIES}
         ${catkin_LIBRARIES}
-)
+        )
 
 ###########
 ## Build ##
@@ -45,9 +46,9 @@ SET(Libraries
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-    OpenCV_INCLUDE_DIRS
+        # include
+        ${catkin_INCLUDE_DIRS}
+        OpenCV_INCLUDE_DIRS
 )
 
 add_executable(${PROJECT_NAME}_node src/main.cpp)
